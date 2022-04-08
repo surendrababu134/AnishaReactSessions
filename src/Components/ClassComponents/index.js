@@ -1,4 +1,6 @@
 import React from "react";
+import { connect } from "react-redux";
+import { getUsers, clearUsers } from '../../actions/Users';
 
 class ClassComponentIndex extends React.Component{
     constructor(props) {
@@ -24,7 +26,10 @@ class ClassComponentIndex extends React.Component{
     // componentdidUpdate
 
     componentDidUpdate(){
-        console.log("Boom");
+        if(this.props.getUsersListResponse){
+            this.setState({userData:[...this.props.getUsersListResponse]});
+            this.props.clearUsers();
+        }
     }
 
 
@@ -35,15 +40,16 @@ class ClassComponentIndex extends React.Component{
     }
 
     componentDidMount(){
-        console.log("ComponentDidMount");
-        (async()=>{
-            try{
-                let apiRes = await fetch('https://gorest.co.in/public/v2/users').then(res=>res.json());
-                this.setState({userData:[...apiRes]});
-            }catch(err){
+        this.props.getUsers();
+        // console.log("ComponentDidMount");
+        // (async()=>{
+        //     try{
+        //         let apiRes = await fetch('https://gorest.co.in/public/v2/users').then(res=>res.json());
+        //         this.setState({userData:[...apiRes]});
+        //     }catch(err){
 
-            }
-        })();
+        //     }
+        // })();
     }
 
     componentWillUnmount(){
@@ -66,4 +72,14 @@ class ClassComponentIndex extends React.Component{
     }
 }
 
-export default ClassComponentIndex;
+const mapStateToProps = state=>({
+    getUsersListResponse:state.UserReducer.getUsersListResponse
+});
+
+export default connect(
+    mapStateToProps,
+    {
+        getUsers,
+        clearUsers
+    }
+)(ClassComponentIndex);

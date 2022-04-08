@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { getFUsers } from "../../actions/Users";
 import Button from "./Button";
 
 /**
@@ -9,7 +12,14 @@ import Button from "./Button";
  */
 
 const FunctionalComponent = ({compName}) =>{
+    const dispatch = useDispatch();
+    const {getUsersList} = useSelector(state=>{
+        return {
+            getUsersList: state.FUserReducer.getUsersList
+        }
+    })
     const [count, setCount] = useState(0);
+    const [userData,setUserData] = useState(getUsersList);
 
     const clickHandler = () =>{
         setCount(count=>count+1);
@@ -20,7 +30,7 @@ const FunctionalComponent = ({compName}) =>{
     })
 
     useEffect(()=>{
-        console.log("mount");
+        dispatch(getFUsers())
     },[])
 
     useEffect(()=>{
@@ -34,11 +44,14 @@ const FunctionalComponent = ({compName}) =>{
         return ()=>{
             console.log("unmount")
         }
-    },[])
+    },[]);
     return (
         <>
             <div>{compName}</div>
             <Button name={`Increment Count by 1: ${count}`} onClick={clickHandler} />
+            {userData && userData.map((item,index)=>{
+                return <p key={item.id}>{item.name}</p>
+            })}
         </>
     )
 }
